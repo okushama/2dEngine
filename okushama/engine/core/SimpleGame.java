@@ -7,8 +7,10 @@ public abstract class SimpleGame {
 	
 	public final Engine engine;
 	private final Input gameInput =  new GameInput(this);
-	private final ITicker gameTicker = new GameTicker(this);
-	private String gameTitle;
+	private final RenderTicker renderTicker = new RenderTicker(this);
+	private final LogicTicker logicTicker = new LogicTicker(this);
+	
+	public String gameTitle;
 	public int windowWidth, windowHeight, displayScale, displayWidth, displayHeight;
 	
 	public SimpleGame(String title, int width, int height, int scaleFactor, String icon){
@@ -19,9 +21,10 @@ public abstract class SimpleGame {
 		displayWidth = windowWidth / scaleFactor;
 		displayHeight = windowHeight / scaleFactor;
 		engine = new Engine(title, windowWidth, windowHeight, scaleFactor, icon);
-		Registry.registerTicker(this, gameTicker);
 		Registry.registerInput(this, gameInput);
-		registerAssets();
+		Registry.registerTicker(this, logicTicker);
+		Registry.registerTicker(this, renderTicker);
+		init();
 		engine.run();
 	}
 	
@@ -36,7 +39,7 @@ public abstract class SimpleGame {
 		engine.setDisplayMode(windowWidth, windowHeight, displayScale);
 	}
 	
-	public abstract void registerAssets();
+	public abstract void init();
 	public abstract void onRenderTick(float pt);
 	public abstract void onLogicTick(float pt);
 	public abstract void onMouseClick(int btn);
@@ -66,23 +69,6 @@ public abstract class SimpleGame {
 		}
 	
 	}
-	
-	private static class GameTicker implements ITicker{
 
-		public SimpleGame theGame;
-		public GameTicker(SimpleGame game){
-			theGame = game;
-		}
-		
-		@Override
-		public void onLogicTick(float partialTick) {
-			theGame.onLogicTick(partialTick);
-		}
 
-		@Override
-		public void onRenderTick(float partialTick) {
-			theGame.onRenderTick(partialTick);
-		}
-		
-	}
 }

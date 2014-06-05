@@ -1,5 +1,6 @@
 package okushama.engine.test;
 
+import static org.lwjgl.opengl.GL11.*;
 import okushama.engine.core.*;
 import okushama.engine.util.Colour;
 import okushama.engine.util.Registry;
@@ -7,7 +8,10 @@ import okushama.engine.util.Renderer;
 import okushama.engine.util.TrueTypeFont;
 
 import org.lwjgl.input.*;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.openal.Audio;
+import org.newdawn.slick.opengl.Texture;
 
 
 /**
@@ -25,6 +29,9 @@ public class TestGame extends SimpleGame {
 	// a few test assets
 	public TrueTypeFont testFont;
 	public Audio testSound;
+	public Texture testTexture;
+	public SpriteSheet testSheet;
+	public Image invader1, invader2, hero;
 
 	// simple position variables to play with
 	public float testX = 0, testY = 0;
@@ -32,15 +39,20 @@ public class TestGame extends SimpleGame {
 	public TestGame() {
 		// WORK DAMN IT
 		// title, window size, display scale
-		super("Test Game", 400, 400, 4, "assets/texture/icon.png");
+		super("Test Game", 400, 400, 2, "assets/texture/test.png");
 	}
 
 	@Override
-	public void registerAssets() {
+	public void init() {
 		// loading of assets into memory
-		testSound = Registry.registerSound("assets/sound/hitone.wav");
+		//testSound = Registry.registerSound("assets/sound/hitone.wav");
 		testFont = Registry.registerFont("assets/font/font.TTF", 12f);
-
+		testTexture = Registry.registerTexture("assets/texture/test2.png");
+		testSheet = Registry.registerSpriteSheet("assets/texture/sheet.png", 16, 16);
+		SpriteSheet invader = Registry.registerSpriteSheet("assets/texture/invaders.png", 16, 16);
+		invader1 = invader.getSprite(0, 0);
+		invader2 = invader.getSprite(1, 0);
+		hero = invader.getSprite(2, 0);
 	}
 
 	@Override
@@ -50,16 +62,23 @@ public class TestGame extends SimpleGame {
 	public void onKeyPress(int key) {
 		if (key == Keyboard.KEY_F11) {
 			// playing with display modes/scale
-			setDisplay(400, 400, 4);
+			setDisplay(400%32, 400%32, 4);
 		}
 	}
 
 	@Override
 	public void onRenderTick(float pt) {
+		int time = (int)((engine.getTime()/500) % 16);
+		glColor4f(1f,0f,0f,1f);
+		if(time % 2 == 0){
+			Renderer.drawSprite(invader1, 40, testY, 32, 32);
+		}else{
+			Renderer.drawSprite(invader2, 40, testY, 32, 32);
+		}
 		
-		// draw a square with text in at test position
-		Renderer.drawRect(testX, testY, 40, 40, Colour.purple);
-		Renderer.drawString(testFont, "o7", testX + 12, testY + 12, Colour.white);
+		Renderer.drawSprite(hero, testX, 0, 32, 32);
+		//Renderer.drawSprite(testSheet, time, 0, testX,	testY, 32, 32);	
+		//Renderer.drawString(testFont, "Sprite Sheet Test #1", 0	, 0, Colour.white);
 	}
 
 	@Override
@@ -87,10 +106,10 @@ public class TestGame extends SimpleGame {
 		if (Mouse.isButtonDown(0)) {
 			int mouseX = Mouse.getX() / displayScale, mouseY = Mouse.getY()
 					/ displayScale;
-			if (mouseX > testX && mouseX < testX + 40 &&
-				mouseY > testY && mouseY < testY + 40) {
-				testX = mouseX - 20;
-				testY = mouseY - 20;
+			if (mouseX > testX && mouseX < testX + 32 &&
+				mouseY > testY && mouseY < testY + 32) {
+				testX = mouseX - 16;
+				testY = mouseY - 16;
 			}
 		}
 		
@@ -101,11 +120,11 @@ public class TestGame extends SimpleGame {
 		if (testY < 0){
 			testY = 0;
 		}
-		if (testX > displayWidth - 40) {
-			testX = displayWidth - 40;
+		if (testX > displayWidth - 32) {
+			testX = displayWidth - 32;
 		}
-		if (testY > displayHeight - 40) {
-			testY = displayHeight - 40;
+		if (testY > displayHeight - 32) {
+			testY = displayHeight - 32;
 		}
 	}
 }

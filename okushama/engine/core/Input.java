@@ -19,7 +19,7 @@ public abstract class Input implements ITicker{
 			}
 		}
 		while (Keyboard.next()) {
-			if (!Keyboard.isRepeatEvent() && !Keyboard.getEventKeyState()) {
+			if (!Keyboard.isRepeatEvent() && Keyboard.getEventKeyState()) {
 				onKeyPress(Keyboard.getEventKey());
 			}
 		}
